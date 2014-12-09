@@ -43,16 +43,16 @@ printf "\n\n"
 # Get the script and license
 #
 printf "\n   Downloading KompSwitch free software license..."
-svn export https://github.com/withaspark/kompswitch/trunk/LICENSE
+svn export https://github.com/withaspark/kompswitch/trunk/LICENSE 1>/dev/null
 printf "done"
 
 printf "\n   Downloading KompSwitch to home directory..."
 cd ${HOME}
-svn export https://github.com/withaspark/kompswitch/trunk/kompswitch
+svn export https://github.com/withaspark/kompswitch/trunk/kompswitch 1>/dev/null
 printf "done"
 
 printf "\n   Making KompSwitch executable..."
-chmod u+x kompswitch
+chmod u+x kompswitch 1>/dev/null
 printf "done"
 
 
@@ -61,11 +61,12 @@ printf "done"
 #
 # Create the launcher on the desktop
 #
-printf "\n   Adding launcher to Desktop..."
-cd Desktop
-svn export https://github.com/withaspark/kompswitch/trunk/kompswitch.desktop
-chmod u+w kompswitch.desktop
-printf "done"
+if [[ -d "Desktop" ]]; then
+   printf "\n   Adding launcher to Desktop..."
+   svn export https://github.com/withaspark/kompswitch/trunk/kompswitch.desktop 1>/dev/null
+   chmod u+w kompswitch.desktop 1>/dev/null
+   printf "done"
+fi
 
 
 
@@ -118,8 +119,8 @@ if [ "$1" != "--auto" ] ; then
       printf "\n      No suitable DVD players were found."
       printf "\n      Please reinstall with "~/kompswitch.install", no quotes and select a different player."
 
-      rm ${HOME}/Desktop/kompswitch.desktop
-      rm ${HOME}/kompswitch
+      @rm ${HOME}/Desktop/kompswitch.desktop
+      @rm ${HOME}/kompswitch
 
       printf "\n\n\n   Aborting installation and removing kompswitch files...done"
       printf "\n\n"
@@ -139,8 +140,8 @@ else
       printf "\n      You cannot use the --auto option for your DVD player."
       printf "\n      Please reinstall with "./kompswitch.install", no quotes and select a different player."
 
-      rm ${HOME}/Desktop/kompswitch.desktop
-      rm ${HOME}/kompswitch
+      @rm ${HOME}/Desktop/kompswitch.desktop
+      @rm ${HOME}/kompswitch
 
       printf "\n\n\n   Aborting installation and removing kompswitch files...done"
       printf "\n\n"
@@ -149,7 +150,10 @@ else
    fi
 fi
 
-echo "Exec=${HOME}/$OPT_CALL" >> kompswitch.desktop
+# Add exec line to desktop launcher once know program to call
+if [[ -f "Desktop/kompswitch.desktop" ]]; then
+   echo "Exec=${HOME}/$OPT_CALL" >> kompswitch.desktop
+fi
 
 
 
