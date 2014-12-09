@@ -43,12 +43,12 @@ printf "\n\n"
 # Get the script and license
 #
 printf "\n   Downloading KompSwitch free software license..."
-wget --quiet https://github.com/withaspark/KompSwitch/trunk/LICENSE
+svn export https://github.com/withaspark/kompswitch/trunk/LICENSE
 printf "done"
 
 printf "\n   Downloading KompSwitch to home directory..."
 cd ${HOME}
-wget --quiet https://github.com/withaspark/KompSwitch/trunk/kompswitch
+svn export https://github.com/withaspark/kompswitch/trunk/kompswitch
 printf "done"
 
 printf "\n   Making KompSwitch executable..."
@@ -63,7 +63,7 @@ printf "done"
 #
 printf "\n   Adding launcher to Desktop..."
 cd Desktop
-wget --quiet https://github.com/withaspark/KompSwitch/trunk/kompswitch.desktop
+svn export https://github.com/withaspark/kompswitch/trunk/kompswitch.desktop
 chmod u+w kompswitch.desktop
 printf "done"
 
