@@ -7,7 +7,8 @@ KompSwitch corrects the flickering DVD playback on some Ubuntu systems with comp
 1. Open up Terminal (or any command line interface) Applications > Accessories > Terminal
 2. Download the installer
 
-		wget https://github.com/withaspark/kompswitch/kompswitch.install
+		cd ~
+		svn export https://github.com/withaspark/kompswitch/trunk/kompswitch.install
 
 3. Make the installer executable 
 
