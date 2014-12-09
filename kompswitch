@@ -1,0 +1,214 @@
+#!/bin/bash
+#
+# Program:    kompswitch
+# Date:       4/19/2008
+# Copyright:  (c) 2008 Stephen Parker
+#
+#
+#    KompSwitch: For automatically disabling/reenabling compositing for DVD playback.
+#    Copyright (C) 2008 Stephen Parker
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see http://www.gnu.org/licenses/.
+#
+#
+# Purpose:    KompSwitch simply addresses the problem with playing DVDs on some Ubuntu systems.
+#             For some systems, playing DVDs with compositing enabled causes flickering during
+#             playback.
+#             It switches off compositing features for the duration that the video player is in
+#             use; as soon as the video player is closed, compositing is re-enabled.
+#             This allows cool desktop effects and the ability to watch DVDs without actively
+#             switching managers; KompSwitch will automatically turn of compositing and re-enable
+#             it upon closing the movie.
+#
+# Directions:
+#             1) Save this entire file to your home directory
+#             2) Make it executable, from Terminal or another command line utility
+#                   sudo chmod u+x kompswitch
+#             3) In Ubuntu, go to System > Preferences > Main Menu
+#             4) Click Sound & Video in the left pane
+#             5) Highlight your video player of choice
+#             6) Click Properties
+#             7) Copy the text command and paste it in this file inside the quotes for PLAYER
+#                   PLAYER="PASTE_IT_HERE"
+#                You can drop the options, only the package name is necessary--totem, vlc, etc.
+#                If you use Totem (default in Ubuntu and this program), then no need to change
+#                anything
+#             8) Change the command to
+#                   /home/YOURUSERNAME/kompswitch [--player PLAYER]
+#                Replace YOURUSERNAME with the name of your home directory and PLAYER with the
+#                command to run your DVD player program. Example: replace PLAYER with vlc
+#             9) Now when you want to run DVDs, click the launcher under the Applications menu
+#
+# Hope this helps and you don't give up on Ubuntu just to watch DVDs!
+#
+
+#####
+#
+# DEFINE YOUR CONFIGURATION HERE
+#
+
+# PLAYER is the command used to run the application you use to play DVDs
+#    Examples: totem, vlc, etc.
+#
+PLAYER="totem"
+
+# DVD_DRIVE is the device used to play DVDs
+#    Change if yours is different
+#       Can also try /dev/scd0?
+#       If you're using VLC, open VLC as normal (without the launcher changed and go to Media > Open Disc
+#          Click the Disc tab and look at the Disc Device box...try that
+DVD_DRIVE="/dev/dvd"
+
+# MAIN_DE is the name of the desktop environment you usually use
+# TEMP_DE is the name of the desk. env. without compositing
+#    Change these two lines to make work for Kubuntu and Xubuntu
+MAIN_DE="compiz"
+TEMP_DE="metacity"
+#####
+
+
+
+prog_info() {
+   printf "\n   KompSwitch"
+   printf "\n   For disabling compositing effects to allow DVD playback in Ubuntu systems"
+   printf "\n"
+   printf "\n   Usage: Call with no arguments to run."
+   printf "\n"
+   printf "\n   Options:"
+   printf "\n      -h | --help:             Show help"
+   printf "\n      --player PLAYER:         Sets the player to be used to PLAYER"
+   printf "\n                               Some options are totem, vlc, etc."
+   printf "\n      -v | --version:          Display current version"
+   printf "\n      --license:               Display the free software license"
+   printf "\n      --remove | --uninstall:  Uninstall kompswitch completely"
+   printf "\n"
+   printf "\n   Examples:"
+   printf "\n      To play DVD using Totem (default):  ~/kompswitch"
+   printf "\n      To play DVD using VLC:              ~/kompswitch --player vlc"
+   printf "\n      To uninstall kompswitch:            ~/kompswitch --uninstall"
+   printf "\n\n"
+}
+switcher() {
+   printf "\n   Turning $MAIN_DE off..."
+   $TEMP_DE --replace 1>/dev/null 2>/dev/null &
+   printf                              "                                                            [done]"
+
+   printf "\n   Watching DVD (close DVD player window when finished)..."
+   $PLAYER $DVD_DRIVE 1>/dev/null 2>/dev/null
+   printf                                                                "                          [done]"
+
+   printf "\n   Turning $MAIN_DE on..."
+   $MAIN_DE --replace 1>/dev/null 2>/dev/null &
+   printf                             "                                                             [done]"
+}
+remove_installer() {
+   INSTALLER=${HOME}/kompswitch.install
+
+   if [ -f $INSTALLER ] ; then
+      rm "$INSTALLER"
+      printf "\n   Removing installer...                                                            [done]"
+   fi
+}
+uninstall() {
+   cd ${HOME}
+   if [ -f Desktop/kompswitch.desktop ] ; then
+      rm Desktop/kompswitch.desktop
+      printf "\n   Removing desktop launcher...                                                     [done]"
+   else
+      printf "\n   Warning: Could not remove Desktop/kompswitch.desktop: It has been moved."
+   fi
+   if [ -f kompswitch.install ] ; then
+      rm kompswitch.install
+   fi
+   if [ -f LICENSE ] ; then
+      rm LICENSE
+      printf "\n   Removing license...                                                              [done]"
+   else
+      printf "\n   Warning: Could not remove LICENSE: It has been moved."
+   fi
+   if [ -f kompswitch ] ; then
+      rm kompswitch
+      printf "\n   Removing script...                                                               [done]"
+   else
+      printf "\n   Warning: Could not remove KompSwitch: It could not be found."
+   fi
+   printf "\n   Uninstallation complete.\n\n"
+}
+version() {
+   printf "Version: 0.4\n"
+}
+header() {
+   printf "\n   KompSwitch                                                                                "
+   printf "\n   For disabling compositing effects to allow DVD playback in Ubuntu systems                 "
+   printf "\n"
+   printf "\n   Program:    kompswitch                                                                    "
+   printf "\n   Copyright:  (c) 2008 Stephen Parker                                                       "
+   printf "\n   Contact:    withaspark.com                                                                "
+   printf "\n\n"
+}
+license() {
+   echo "`cat LICENSE`";
+   printf "\n";
+}
+
+
+
+if [ $# -ne 0 ] ; then
+   case $1 in
+      -h | --help)
+         prog_info
+         exit 0
+         ;;
+      --player)
+         if [ $# -eq 2 ] ; then
+            PLAYER=$2
+            header
+            remove_installer
+            switcher
+            printf "\n\n"
+         else
+            header
+            printf "\n   Error: --player option requires a DVD player to be specified.\n"
+            printf "      A third argument of the player name is required.\n"
+            printf "      Example: ~/kompswitch --player vlc\n\n"
+         fi
+         exit 0
+         ;;
+      --remove | --uninstall)
+         header
+         uninstall
+         exit 0
+         ;;
+      -v | --version)
+         version
+         exit 0
+         ;;
+      --license)
+         license
+         exit 0
+         ;;
+      *)
+         header
+         printf "\n   Error: $1 is not a valid option.\n       ...I don't get it. Try again.\n\n"
+         exit 0
+         ;;
+   esac
+else
+   header
+   remove_installer
+   switcher
+fi
+
+printf "\n\n"
+exit 0
