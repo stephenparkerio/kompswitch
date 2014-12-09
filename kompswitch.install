@@ -1,0 +1,166 @@
+#!/bin/bash
+#
+# This is the installer for kompswitch and can be removed at any time.
+#
+# Program:    kompswitch.installer
+# Date:       4/19/2008
+# Copyright:  (c) 2008 Stephen Parker
+# 
+#    KompSwitch Installer: For installing KompSwitch script.
+#    Copyright (C) 2008 Stephen Parker
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see http://www.gnu.org/licenses/.
+#
+
+
+
+#####
+#
+# Show intro
+#
+printf "\n\n   KompSwitch Installer"
+printf "\n   This script will install KompSwitch to your home directory"
+printf "\n\n   License: Distributed under the GNU General Public License"
+printf "\n   For the complete license type \"~/kompswitch --license\" (without quotes) before using."
+printf "\n   If you do not agree to these terms type \"~/kompswitch --uninstall\" and do NOT use the program."
+printf "\n\n"
+
+
+
+#####
+#
+# Get the script and license
+#
+printf "\n   Downloading KompSwitch free software license..."
+wget --quiet https://github.com/withaspark/KompSwitch/trunk/LICENSE
+printf "done"
+
+printf "\n   Downloading KompSwitch to home directory..."
+cd ${HOME}
+wget --quiet https://github.com/withaspark/KompSwitch/trunk/kompswitch
+printf "done"
+
+printf "\n   Making KompSwitch executable..."
+chmod u+x kompswitch
+printf "done"
+
+
+
+#####
+#
+# Create the launcher on the desktop
+#
+printf "\n   Adding launcher to Desktop..."
+cd Desktop
+wget --quiet https://github.com/withaspark/KompSwitch/trunk/kompswitch.desktop
+chmod u+w kompswitch.desktop
+printf "done"
+
+
+
+#####
+#
+# Configure launcher to given DVD player
+#
+printf "\n   Configuring KompSwitch launcher..."
+
+# Check for known DVD players
+printf "\n      Detecting DVD players..."
+VLC_CHECK=`which vlc`
+TOTEM_CHECK=`which totem`
+
+if [ "$VLC_CHECK" != "" ] ; then
+   OPT_CALL="kompswitch --player vlc"
+   printf "\n         Found vlc"
+fi
+if [ "$TOTEM_CHECK" != "" ] ; then
+   OPT_CALL="kompswitch"
+   printf "\n         Found totem"
+fi
+
+
+
+# If --auto not specified, prompt user for any other players they may like
+if [ "$1" != "--auto" ] ; then
+   printf "\n\n      What is the name of the package you would like to use to play DVDs?"
+   printf   "\n         (vlc, totem, other? Press enter when done)"
+   printf   "\n         ? "
+   read PLAYER
+   PLAYER_CHECK=`which $PLAYER`
+
+   if [ "$PLAYER" = "totem" ] ; then   # If gave totem as selection
+      OPT_CALL="kompswitch"
+      printf "\n         Configured to totem"
+   elif [ "$PLAYER_CHECK" != "" ] ; then   # If gave available program not totem
+      OPT_CALL="kompswitch --player $PLAYER"
+      printf "\n         Configured to $PLAYER"
+   elif [ "$VLC_CHECK" != "" ] ; then   # If given program not found and vlc available
+      OPT_CALL="kompswitch --player vlc"
+      printf "\n         Notice: \"$PLAYER\" not installed..."
+      printf "\n            Configured to vlc instead"
+   elif [ "$TOTEM_CHECK" != "" ] ; then   # If given program not found and totem available
+      OPT_CALL="kompswitch"
+      printf "\n         Notice: \"$PLAYER\" not installed..."
+      printf "\n            Configured to totem instead"
+   else   # If given program not found and no good players found
+      printf "\n   Error: \"$PLAYER\" not installed."
+      printf "\n      No suitable DVD players were found."
+      printf "\n      Please reinstall with "~/kompswitch.install", no quotes and select a different player."
+
+      rm ${HOME}/Desktop/kompswitch.desktop
+      rm ${HOME}/kompswitch
+
+      printf "\n\n\n   Aborting installation and removing kompswitch files...done"
+      printf "\n\n"
+
+      exit 1
+   fi
+# If --auto option given
+else
+   if [ "$VLC_CHECK" != "" ] ; then
+      OPT_CALL="kompswitch --player vlc"
+      printf "\n         Configured to vlc"
+   elif [ "$TOTEM_CHECK" != "" ] ; then
+      OPT_CALL="kompswitch"
+      printf "\n         Configured to totem"
+   else
+      printf "\n   Error:  No suitable DVD players were found."
+      printf "\n      You cannot use the --auto option for your DVD player."
+      printf "\n      Please reinstall with "./kompswitch.install", no quotes and select a different player."
+
+      rm ${HOME}/Desktop/kompswitch.desktop
+      rm ${HOME}/kompswitch
+
+      printf "\n\n\n   Aborting installation and removing kompswitch files...done"
+      printf "\n\n"
+
+      exit 1
+   fi
+fi
+
+echo "Exec=${HOME}/$OPT_CALL" >> kompswitch.desktop
+
+
+
+#####
+#
+# Clean up and close
+#
+printf "\n\n\n   Installation complete."
+printf "\n\n   You may now watch DVDs by clicking the launcher on your desktop."
+
+printf "\n\n   If you have any difficulties, type \"~/kompswitch --help\", without quotes."
+printf "\n\n"
+
+exit 0
