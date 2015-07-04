@@ -154,7 +154,7 @@ header() {
    printf "\n"
    printf "\n   Program:    kompswitch                                                                    "
    printf "\n   Copyright:  (c) 2008 Stephen Parker                                                       "
-   printf "\n   Contact:    withaspark.com                                                                "
+   printf "\n   Contact:    http://stephenparker.io                                                       "
    printf "\n\n"
 }
 license() {

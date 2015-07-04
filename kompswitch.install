@@ -43,12 +43,12 @@ printf "\n\n"
 # Get the script and license
 #
 printf "\n   Downloading KompSwitch free software license..."
-svn export https://github.com/withaspark/kompswitch/trunk/LICENSE 1>/dev/null
+svn export https://github.com/stephenparkerio/kompswitch/trunk/LICENSE 1>/dev/null
 printf "done"
 
 printf "\n   Downloading KompSwitch to home directory..."
 cd ${HOME}
-svn export https://github.com/withaspark/kompswitch/trunk/kompswitch 1>/dev/null
+svn export https://github.com/stephenparkerio/kompswitch/trunk/kompswitch 1>/dev/null
 printf "done"
 
 printf "\n   Making KompSwitch executable..."
@@ -63,7 +63,7 @@ printf "done"
 #
 if [[ -d "Desktop" ]]; then
    printf "\n   Adding launcher to Desktop..."
-   svn export https://github.com/withaspark/kompswitch/trunk/kompswitch.desktop 1>/dev/null
+   svn export https://github.com/stephenparkerio/kompswitch/trunk/kompswitch.desktop 1>/dev/null
    chmod u+w kompswitch.desktop 1>/dev/null
    printf "done"
 fi
